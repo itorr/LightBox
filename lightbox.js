@@ -1,6 +1,7 @@
 
 var 
 html=document.documentElement,
+body=document.body,
 toArray=function(arr){
 	return Array.prototype.slice.call(arr);
 },
@@ -11,37 +12,271 @@ getAllImages=function(){
 	imgs=toArray(imgs);
 },
 最后一张图,
-showImage=function(dom){
+根据限制返回长宽数值=function(宽,高,最大宽,最大高){
 
 	var 
-	rect=dom.getClientRects()[0];
+	比例=最大高/最大宽;
 
-	console.log(rect);
+
+
+	最大宽=最大宽||html.clientWidth;
+	最大高=最大高||html.clientHeight;//window.screen.availHeight;
+
+	//window.screen.height;
+	//window.screen.availHeight
+
+	var 
+	新比例=高/宽;
+
+	if(宽<最大宽&&高<最大高){
+		return {
+			width:宽,
+			height:高,
+			top:(最大高-高)/2,
+			left:(最大宽-宽)/2,
+		};
+	}
+
+	if(宽>最大宽){
+		宽=最大宽;
+		高=宽*新比例;
+	}
+
+	if(高>最大高){
+		高=最大高;
+		宽=高/新比例;
+	}
+
+	return {
+		width:宽,//Math.round(宽),
+		height:高,//Math.round(高),
+		top:(最大高-高)/2,
+		left:(最大宽-宽)/2,
+	};
+},
+根据限制返回左延距离=function(width){
+	var 
+	最大宽=body.offsetWidth;
+
+	return (最大宽-width)/2;
+},
+根据限制返回顶部距离=function(height){
+	var 
+	最大高=html.clientHeight;
+
+	return (最大高-height)/2;
+},
+展示副本=function(dom,over){
+
+	var 
+	rect=dom.getBoundingClientRect();
+
+
+	var 
+	ghost=dom.ghost||dom.cloneNode(1);
+
+	var 
+	差比例=rect.width/(over.width-rect.width);
+
+
+	var 
+	顶距=rect.top-over.top;
+	trTop=(顶距*差比例);
+	trTop=trTop/rect.height*100;//+50;
+
+
+	var 
+	差左=rect.left-over.left;
+	trLeft=(差左*差比例);
+	trLeft=trLeft/rect.width*100;//+50;
+
+
+	var 
+	比例=(over.width/rect.width);
+
+	console.log(over,rect,比例);
+
+	ghost.removeAttribute('lightbox');
+	ghost.className='lightbox-ghost';
+	ghost.style.cssText='transform-origin:'+trLeft+'% '+trTop+'%;'+
+						'top:'+rect.top+'px;'+
+						'right:'+rect.right+'px;'+
+						'bottom:'+rect.bottom+'px;'+
+						'left:'+rect.left+'px;';
+
+
+	BOX.appendChild(ghost);
+
+	setTimeout(function(){
+		ghost.style.cssText+='transform:scale('+比例+');';
+	});
+
+	return ghost;
+
+},
+showImage=function(dom){
 
 	html.setAttribute('lightbox-switch',1);
 
-	DOM.classList.remove('hide');
+
+	var 
+	img;
+	if(dom.img){
+		img=dom.img;
+	}else{
+		img=document.createElement('img');
+		img.className='lightbox-bigger-img';
+		img.src=dom.getAttribute('data-url')||dom.src;
+	}
+
+	放大倍数=默认放大倍数;
 
 
 
 	var 
-	img=document.createElement('img');
+	width=Math.max(+dom.getAttribute('data-width'),dom.naturalWidth*2),
+	height=Math.max(+dom.getAttribute('data-height'),dom.naturalHeight*2);
 
-	img.src=dom.getAttribute('data-url')||dom.src;
+	var 
+	over=根据限制返回长宽数值(width,height);
+	var 
+	ghost=展示副本(dom,over);
 
-	放大倍数=默认放大倍数;
+	dom.ghost=ghost;
+	dom.img=img;
 	
-	BOX.appendChild(img);
+	var 
+	start=+new Date();
 
-	if(最后一张图){
-		BOX.removeChild(最后一张图);
+	img.style.cssText=
+		'width:'+over.width+'px;'+
+		'height:'+over.height+'px;';
+
+	var 
+	func=function(){
+		var 
+		now=+new Date(),
+		diff=now-start;
+
+		if(diff>300){
+			// body.removeChild(ghost);
+			BOX.appendChild(img);
+			判断分组信息(dom);
+		}else{
+			setTimeout(function(){
+				// body.removeChild(ghost);
+				BOX.appendChild(img);
+				判断分组信息(dom);
+			},300-diff);
+		}
+	};
+	if(img.complete){
+		func();
+	}else{
+
+		img.onload=func;
 	}
 
-	最后一张图=img;
+	dom.classList.add('lightbox-hidden');
+	DOM.classList.remove('hide');
+
+	if(最后一张图 && 最后一张图.img && 最后一张图.img.parentNode){
+		closeImage(最后一张图,1);
+	}
+
+	最后一张图=dom;
+},
+closeImage=function(dom,shadow){
+	console.log(dom,dom.img);
+	BOX.appendChild(dom.ghost);
+	BOX.removeChild(dom.img);
+
+	setTimeout(function(){
+		dom.ghost.style.cssText+='transform:scale(1);';
+	});
+
+	if(!shadow){
+		DOM.classList.add('shadowout');
+		GROUP.innerHTML='';
+	}
+	
+	setTimeout(function(){
+		BOX.removeChild(dom.ghost);
+		dom.classList.remove('lightbox-hidden');
+
+
+		if(!shadow){
+			html.removeAttribute('lightbox-switch');
+			DOM.classList.add('hide');
+			DOM.classList.remove('shadowout');
+		}
+	},300);
+
 },
 closeAll=function(){
-	html.removeAttribute('lightbox-switch');
-	DOM.classList.add('hide');
+	if(最后一张图){
+		closeImage(最后一张图);
+	};
+},
+判断分组信息=function(dom){
+
+	var 
+	group=dom.getAttribute('data-group');
+
+	if(!group){
+		GROUP.innerHTML='';
+		return;
+	}
+
+	var 
+	imgs=Array.prototype.slice.call(document.querySelectorAll('img[lightbox][data-group="'+group+'"]'));
+
+	var 
+	length=imgs.length;
+
+	if(length<=1){
+		GROUP.innerHTML='';
+		return;
+	}
+
+	var 
+	i=imgs.indexOf(dom);
+
+	GROUP.innerHTML=(i+1)+'/'+length;
+
+},
+nextImage=function(){
+	if(!最后一张图){
+		return;
+	}
+
+	var 
+	group=最后一张图.getAttribute('data-group');
+
+
+	if(!group){
+		return;
+	}
+
+	var 
+	imgs=Array.prototype.slice.call(document.querySelectorAll('img[lightbox][data-group="'+group+'"]'));
+
+	if(!imgs.length){
+		return;
+	}
+
+	var 
+	i=imgs.indexOf(最后一张图);
+
+	var 
+	num=i+1;
+
+	if(num==imgs.length){
+		return;
+	}
+
+	showImage(imgs[num]);
+
 };
 
 var 
@@ -52,30 +287,32 @@ DOM.className='lightbox-shadow hide';
 DOM.innerHTML='<div class="lightbox-box"></div><h4></h4><i></i>';
 
 
-document.body.appendChild(DOM);
+body.appendChild(DOM);
 
 var 
 BOX=DOM.querySelector('.lightbox-box');
+var 
+GROUP=DOM.querySelector('i');
 
-document.body.addEventListener('click',function(e){
+body.addEventListener('click',function(e){
 	var 
 	target=e.target;
 
 	if(target.getAttribute('lightbox')===''){
 		showImage(target);
-	}else if(target.classList.contains('lightbox-shadow')){
-		closeAll();
 	}
 });
 
-
+DOM.onclick=function(){
+	closeAll();
+};
 
 DOM.onmousemove=function(e){
-	console.log(e);
+	// console.log(e);
 	var 
 	o=e.target;
 
-	最后一张图.style.cssText+='transform-origin:'+e.clientX/html.clientWidth*100+'% '+e.clientY/html.clientHeight*100+'%;';
+	最后一张图.img.style.cssText+='transform-origin:'+e.clientX/html.clientWidth*100+'% '+e.clientY/html.clientHeight*100+'%;';
 };
 
 var 
@@ -86,7 +323,7 @@ DOM.onmousewheel = function(e) {
 	var 
 	o=e.target;
 
-	最后一张图.style.cssText+='transform-origin:'+e.clientX/html.clientWidth*100+'% '+e.clientY/html.clientHeight*100+'%;';
+	最后一张图.img.style.cssText+='transform-origin:'+e.clientX/html.clientWidth*100+'% '+e.clientY/html.clientHeight*100+'%;';
 
     // console.log(e.deltaY,e.target);
 
@@ -99,5 +336,5 @@ DOM.onmousewheel = function(e) {
     	放大倍数=最大放大倍数;
     }
 
-	最后一张图.style.cssText+='transform:scale('+放大倍数+');';
+	最后一张图.img.style.cssText+='transform:scale('+放大倍数+');';
 };

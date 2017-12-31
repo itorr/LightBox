@@ -1,5 +1,13 @@
+
 html[lightbox-switch]{
 	overflow: hidden;
+}
+
+.content-image{
+	img{
+		position: relative;
+		z-index:1;
+	}
 }
 
 .lightbox-shadow{
@@ -9,19 +17,60 @@ html[lightbox-switch]{
 	right:0;
 	bottom:0;
 
+	z-index:9e9;
+
 	background:rgba(0,0,0,.8);
 
-	img{
-		position: absolute;
+	animation:shadowin .3s none;
+
+	.lightbox-bigger-img{
+		position:absolute;
 		top:0;
 		left:0;
 		right:0;
 		bottom:0;
+		z-index:2;
 		margin:auto;
 		max-height:100vh;
 		max-width:100vw;
 	}
+	&.shadowout{
+		animation:shadowout .3s none;
+	}
 	&.hide{
 		display:none;
 	}
+	i{
+		position:absolute;
+		bottom:1em;
+		right:1em;
+		z-index:3;
+		color:#FFF;
+		text-shadow:0 1px 0 #000;
+		font-style:normal;
+		line-height:1;
+		font-weight:bold;
+	}
+}
+
+@keyframes shadowin {
+	from{
+		background:rgba(0,0,0,0);
+	}
+}
+@keyframes shadowout {
+	to{
+		background:rgba(0,0,0,0);
+	}
+}
+
+.lightbox-ghost{
+	position:fixed;
+	z-index:1;
+	transition:.3s ease;
+
+	pointer-events:none;
+}
+.lightbox-hidden{
+	visibility:hidden;
 }
