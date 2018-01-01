@@ -1,14 +1,20 @@
 
-html[lightbox-switch]{
-	overflow: hidden;
-}
-
-.content-image{
-	img{
-		position: relative;
-		z-index:1;
+html{
+	&[lightbox-switch]{
+		overflow: hidden;
+	}
+	&[lightbox-loading]{
+		cursor:wait;
+		pointer-events:none;
 	}
 }
+
+// .content-image{
+// 	img{
+// 		position: relative;
+// 		z-index:1;
+// 	}
+// }
 
 .lightbox-shadow{
 	position: fixed;

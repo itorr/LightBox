@@ -1,3 +1,4 @@
+(function(){
 
 var 
 html=document.documentElement,
@@ -12,6 +13,7 @@ getAllImages=function(){
 	imgs=toArray(imgs);
 },
 最后一张图,
+loading=0,
 根据限制返回长宽数值=function(宽,高,最大宽,最大高){
 
 	var 
@@ -94,11 +96,12 @@ getAllImages=function(){
 	var 
 	比例=(over.width/rect.width);
 
-	console.log(over,rect,比例);
 
 	ghost.removeAttribute('lightbox');
 	ghost.className='lightbox-ghost';
 	ghost.style.cssText='transform-origin:'+trLeft+'% '+trTop+'%;'+
+						'width:'+rect.width+'px;'+
+						'height:'+rect.height+'px;'+
 						'top:'+rect.top+'px;'+
 						'right:'+rect.right+'px;'+
 						'bottom:'+rect.bottom+'px;'+
@@ -106,6 +109,7 @@ getAllImages=function(){
 
 
 	BOX.appendChild(ghost);
+
 
 	setTimeout(function(){
 		ghost.style.cssText+='transform:scale('+比例+');';
@@ -115,6 +119,18 @@ getAllImages=function(){
 
 },
 showImage=function(dom){
+	if(loading){
+		return;
+	}
+
+	if(最后一张图 && 最后一张图.img && 最后一张图.img.parentNode){
+		closeImage(最后一张图,1);
+	}
+
+
+	loading=1;
+
+	html.setAttribute('lightbox-loading',1);
 
 	html.setAttribute('lightbox-switch',1);
 
@@ -153,41 +169,40 @@ showImage=function(dom){
 		'height:'+over.height+'px;';
 
 	var 
-	func=function(){
+	onload=function(){
 		var 
 		now=+new Date(),
-		diff=now-start;
-
-		if(diff>300){
-			// body.removeChild(ghost);
+		diff=now-start,
+		func=function(){
 			BOX.appendChild(img);
 			判断分组信息(dom);
+			loading=0;
+		};
+
+		html.removeAttribute('lightbox-loading');
+
+		if(diff>300){
+			func();
 		}else{
-			setTimeout(function(){
-				// body.removeChild(ghost);
-				BOX.appendChild(img);
-				判断分组信息(dom);
-			},300-diff);
+			setTimeout(func,300-diff);
 		}
 	};
 	if(img.complete){
-		func();
+		onload();
 	}else{
 
-		img.onload=func;
+		img.onload=onload;
 	}
 
 	dom.classList.add('lightbox-hidden');
 	DOM.classList.remove('hide');
 
-	if(最后一张图 && 最后一张图.img && 最后一张图.img.parentNode){
-		closeImage(最后一张图,1);
-	}
-
 	最后一张图=dom;
 },
 closeImage=function(dom,shadow){
-	console.log(dom,dom.img);
+	if(loading){
+		return;
+	}
 	BOX.appendChild(dom.ghost);
 	BOX.removeChild(dom.img);
 
@@ -246,6 +261,10 @@ closeAll=function(){
 
 },
 nextImage=function(){
+	if(loading){
+		return;
+	}
+
 	if(!最后一张图){
 		return;
 	}
@@ -338,3 +357,5 @@ DOM.onmousewheel = function(e) {
 
 	最后一张图.img.style.cssText+='transform:scale('+放大倍数+');';
 };
+
+})();
