@@ -58,6 +58,7 @@ html{
 	}
 	&.shadowout{
 		animation:shadowout .3s none;
+		background:rgba(0,0,0,0);
 	}
 	&.hide{
 		display:none;
@@ -81,6 +82,9 @@ html{
 	}
 }
 @keyframes shadowout {
+	from{
+		background:rgba(0,0,0,.8);
+	}
 	to{
 		background:rgba(0,0,0,0);
 	}
