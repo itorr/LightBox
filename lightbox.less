@@ -5,7 +5,10 @@ html{
 	}
 	&[lightbox-loading]{
 		cursor:wait;
-		pointer-events:none;
+		// pointer-events:none;
+		.lightbox-shadow:after{
+			display:block;
+		}
 	}
 }
 
@@ -28,6 +31,19 @@ html{
 	background:rgba(0,0,0,.8);
 
 	animation:shadowin .3s none;
+
+	&:after{
+		display:none;
+		content:'';
+		width: 6px;
+		height: 6px;
+		border-radius:9em;
+		background:#FFF;
+		animation:lightboxloading 1s infinite;
+		position: absolute;
+		top:1em;
+		right:1em;
+	}
 
 	.lightbox-bigger-img{
 		position:absolute;
@@ -79,4 +95,12 @@ html{
 }
 .lightbox-hidden{
 	visibility:hidden;
+}
+
+
+
+@keyframes lightboxloading {
+	50%{
+		opacity:0;
+	}
 }

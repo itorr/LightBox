@@ -22,7 +22,7 @@ loading=0,
 
 
 	最大宽=最大宽||html.clientWidth;
-	最大高=最大高||html.clientHeight;//window.screen.availHeight;
+	最大高=最大高||window.innerHeight||html.clientHeight;//window.screen.availHeight;
 
 	//window.screen.height;
 	//window.screen.availHeight
@@ -55,18 +55,6 @@ loading=0,
 		top:(最大高-高)/2,
 		left:(最大宽-宽)/2,
 	};
-},
-根据限制返回左延距离=function(width){
-	var 
-	最大宽=body.offsetWidth;
-
-	return (最大宽-width)/2;
-},
-根据限制返回顶部距离=function(height){
-	var 
-	最大高=html.clientHeight;
-
-	return (最大高-height)/2;
 },
 展示副本=function(dom,over){
 
@@ -118,6 +106,7 @@ loading=0,
 	return ghost;
 
 },
+lightboxSwitch=0,
 showImage=function(dom){
 	if(loading){
 		return;
@@ -131,6 +120,8 @@ showImage=function(dom){
 	loading=1;
 
 	html.setAttribute('lightbox-loading',1);
+
+	lightboxSwitch=1;
 
 	html.setAttribute('lightbox-switch',1);
 
@@ -214,6 +205,8 @@ closeImage=function(dom,shadow){
 		DOM.classList.add('shadowout');
 		GROUP.innerHTML='';
 	}
+
+	lightboxSwitch=0;
 	
 	setTimeout(function(){
 		BOX.removeChild(dom.ghost);
@@ -258,6 +251,43 @@ closeAll=function(){
 	i=imgs.indexOf(dom);
 
 	GROUP.innerHTML=(i+1)+'/'+length;
+
+},
+prevImage=function(){
+	if(loading){
+		return;
+	}
+
+	if(!最后一张图){
+		return;
+	}
+
+	var 
+	group=最后一张图.getAttribute('data-group');
+
+
+	if(!group){
+		return;
+	}
+
+	var 
+	imgs=Array.prototype.slice.call(document.querySelectorAll('img[lightbox][data-group="'+group+'"]'));
+
+	if(!imgs.length){
+		return;
+	}
+
+	var 
+	i=imgs.indexOf(最后一张图);
+
+	var 
+	num=i-1;
+
+	if(num==-1){
+		return;
+	}
+
+	showImage(imgs[num]);
 
 },
 nextImage=function(){
@@ -334,11 +364,13 @@ DOM.onmousemove=function(e){
 	最后一张图.img.style.cssText+='transform-origin:'+e.clientX/html.clientWidth*100+'% '+e.clientY/html.clientHeight*100+'%;';
 };
 
+
 var 
 放大倍数=1,
 默认放大倍数=1,
 最大放大倍数=5;
 DOM.onmousewheel = function(e) {
+	e.preventDefault();
 	var 
 	o=e.target;
 
@@ -358,4 +390,47 @@ DOM.onmousewheel = function(e) {
 	最后一张图.img.style.cssText+='transform:scale('+放大倍数+');';
 };
 
+
+addEventListener('keyup',function(e){
+	
+
+	if(lightboxSwitch){
+		// console.log(e);
+		switch(e.keyCode){
+			case 37:
+				prevImage();
+				break;
+			case 39:
+				nextImage();
+				break;
+		}
+	}
+});
+
+var 
+双指放大中=0,
+startTouchs={};
+
+DOM.ontouchstart=function(e){
+
+	console.log(e.touches);
+
+	if(e.touches.length==2){
+		双指放大中=1;
+
+		startTouchs.a=e.touches[0];
+		startTouchs.b=e.touches[1];
+	}
+};
+DOM.ontouchmove=function(e){
+	e.preventDefault();
+
+	return;
+
+	console.log(e.touches);
+
+	if(e.touches.length==2){
+
+	}
+};
 })();
