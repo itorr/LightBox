@@ -82,7 +82,7 @@ loading=0,
 
 
 	var 
-	比例=(over.width/rect.width);
+	scale=(over.width/rect.width);
 
 
 	ghost.removeAttribute('lightbox');
@@ -100,7 +100,7 @@ loading=0,
 
 
 	setTimeout(function(){
-		ghost.style.cssText+='transform:scale('+比例+');';
+		ghost.style.cssText+='transform:scale('+scale+');';
 	});
 
 	return ghost;
