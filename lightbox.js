@@ -352,10 +352,6 @@ body.addEventListener('click',function(e){
 	}
 });
 
-DOM.onclick=function(){
-	closeAll();
-};
-
 DOM.onmousemove=function(e){
 	// console.log(e);
 	var 
@@ -392,7 +388,6 @@ DOM.onmousewheel = function(e) {
 
 
 addEventListener('keyup',function(e){
-	
 
 	if(lightboxSwitch){
 		// console.log(e);
@@ -433,4 +428,80 @@ DOM.ontouchmove=function(e){
 
 	}
 };
+
+
+
+
+DOM.onclick=function(){
+	closeAll();
+};
+
+/*
+
+
+var 
+beforex,
+beforey,
+moveswitch,
+
+
+histmovex=0,
+histmovey=0,
+movex,
+movey;
+
+
+var 
+startClickTime;
+
+DOM.onmousedown=function(e){
+	e.stopPropagation();
+	e.preventDefault();
+
+	beforex=e.x||e.pageX// ||e.touches[0].pageX;
+	beforey=e.y||e.pageY// ||e.touches[0].pageY;
+	moveswitch=1;
+
+	startClickTime=+new Date();
+};
+
+DOM.onmousemove=function(e){
+
+	e.stopPropagation();
+	e.preventDefault();
+
+	if(!moveswitch){
+		return;
+	}
+	var 
+	x,y;
+
+	x=e.x||e.pageX// ||e.touches[0].pageX;
+	y=e.y||e.pageY// ||e.touches[0].pageY;
+
+
+	movex=histmovex+x-beforex;
+	movey=histmovey+y-beforey;
+	BOX.style.cssText='transform:translate('+movex+'px,'+movey+'px)';
+}
+
+DOM.onmouseup=function(e){
+	moveswitch=0;
+	e.stopPropagation();
+	e.preventDefault();
+	// BOX.style.cssText='';
+
+	histmovex=movex;
+	histmovey=movey;
+	var 
+	now=+new Date();
+
+	if((now-startClickTime)<100){
+		closeAll();
+	}
+};
+
+*/
+
+
 })();

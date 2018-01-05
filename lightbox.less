@@ -2,13 +2,21 @@
 html{
 	&[lightbox-switch]{
 		overflow: hidden;
-		padding-right:8px;
+		
 	}
 	&[lightbox-loading]{
 		cursor:wait;
 		// pointer-events:none;
 		.lightbox-shadow:after{
 			display:block;
+		}
+	}
+}
+
+@media (min-width:800px) {
+	html{
+		&[lightbox-switch]{
+			padding-right:8px;
 		}
 	}
 }
@@ -44,6 +52,10 @@ html{
 		position: absolute;
 		top:1em;
 		right:1em;
+	}
+
+	.lightbox-box{
+		height:100%;
 	}
 
 	.lightbox-bigger-img{
