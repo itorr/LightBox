@@ -135,7 +135,7 @@ showImage=function(dom){
 		img.className='lightbox-bigger-img';
 		img.src=dom.getAttribute('data-url')||dom.src;
 	}
-
+	
 	放大倍数=默认放大倍数;
 
 
